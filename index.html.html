@@ -381,7 +381,8 @@ async function init() {
   document.getElementById('err-box').style.display = 'none';
   activeMonth = null; activeBlok = null; filterMode = 'all';
   try {
-    const res = await fetch(PROXY + encodeURIComponent(CSV_URL));
+    // PERBAIKAN: Langsung mengambil data ke Google Sheets tanpa perantara proxy yang lambat
+    const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error();
     const text = await res.text();
     parseCSV(text);
@@ -391,12 +392,24 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
   } catch (e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('err-box').style.display = 'block';
-    document.getElementById('err-box').innerHTML = '⚠️ Gagal memuat data. Pastikan perangkat terhubung ke internet, lalu klik <strong>Refresh</strong>.';
+    // Jika browser memblokir karena masalah CORS, otomatis gunakan proxy cadangan
+    try {
+      const res = await fetch(PROXY + encodeURIComponent(CSV_URL));
+      if (!res.ok) throw new Error();
+      const text = await res.text();
+      parseCSV(text);
+      if (!allRows.length) throw new Error('empty');
+      buildUI();
+      render();
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    } catch (err) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('err-box').style.display = 'block';
+      document.getElementById('err-box').innerHTML = '⚠️ Gagal memuat data. Pastikan perangkat terhubung ke internet, lalu klik <strong>Refresh</strong>.';
+    }
   }
 }
-
 init();
 </script>
 </body>
