@@ -79,14 +79,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .bbtn:hover{background:var(--bg);border-color:var(--border2)}
 .bbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
 
-/* TABLE */
-.table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow-x: auto; /* <-- INI YANG DITAMBAHKAN AGAR BISA DIGESER */
-  -webkit-overflow-scrolling: touch; /* Biar gesernya mulus di HP Android/iPhone */
-}
+/* TABLE - AKTIF SCROLLABLE DI HP */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
 .table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 .table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
@@ -119,10 +113,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* RESPONSIVE */
 @media(max-width:700px){
   .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .container{padding:1rem}
+  .container{padding:0.75rem}
   .header{padding:1rem}
-  .nama-cell{font-size:12px}
-  .dot{width:16px;height:16px;font-size:7.5px}
+  .nama-cell{font-size:11.5px}
+  .dots { gap: 1px !important; }
+  .dot {
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 7px !important;
+    border-radius: 2px !important;
+  }
+  .blok-tag { padding: 1px 4px !important; font-size: 9.5px !important; }
 }
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr 1fr}
@@ -141,12 +142,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <div class="header">
   <div class="logo-area">
-    <div class="logo-circle">
+   <div class="logo-circle">
   <img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
 </div>
     <div class="logo-text">
       <h1>Kas Puri Asri 3</h1>
-      <p>RT 01 / RW 012 · TH.2026</p>
+      <p>RUKUN WARGA 012 · TH.2026</p>
     </div>
   </div>
   <div class="header-right">
@@ -170,17 +171,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <div class="value" id="s-total">—</div>
         <div class="sub">terdaftar</div>
       </div>
-      <div class="stat-card green">
-        <div class="label">Total Kas</div>
-        <div class="value" id="s-kas">—</div>
-        <div class="sub" id="s-kas-sub"></div>
+      <div class="stat-card red">
+        <div class="label">Total Sisa Kas</div> <div class="value" id="s-kas">—</div>
+        <div class="sub" id="s-kas-sub">tunggakan</div>
       </div>
-      <div class="stat-card amber">
+      <div class="stat-card green">
         <div class="label">Ada Pembayaran</div>
         <div class="value" id="s-bayar">—</div>
         <div class="sub">anggota</div>
       </div>
-      <div class="stat-card red">
+      <div class="stat-card amber">
         <div class="label">Belum Bayar</div>
         <div class="value" id="s-none">—</div>
         <div class="sub">anggota</div>
@@ -188,7 +188,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
 
     <div class="summary-bar">
-      <div class="bar-label">Persentase anggota yang sudah bayar</div>
+      <div class="bar-label">Persentase anggota yang sudah mulai mencicil/bayar kas</div>
       <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
       <div class="bar-meta">
         <span id="prog-left"></span>
@@ -219,7 +219,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             <th>Pemilik</th>
             <th>Jan Feb Mar Apr Mei Jun Jul Agu Sep Okt Nov Des</th>
             <th style="text-align:right;width:80px">Total</th>
-            <th style="text-align:center;width:68px">Status</th>
+            <th style="text-align:right;width:80px">Sisa</th> <th style="text-align:center;width:68px">Status</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -233,7 +233,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-// Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
 
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -241,15 +240,23 @@ const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','D
 
 let allRows = [], filterMode = 'all', activeMonth = null, activeBlok = null;
 
+// Fungsi pembersih nominal super fleksibel (Anti-error koma/titik/Rp)
 function parseK(v) {
   if (!v) return 0;
-  v = v.toString().trim().toUpperCase().replace(/"/g, '');
-  const m = v.match(/^(\d+(?:\.\d+)?)K$/);
-  if (m) return parseFloat(m[1]) * 1000;
-  const n = parseFloat(v.replace(/[^0-9.]/g, ''));
+  v = v.toString().trim().toUpperCase().replace(/"/g, '').replace(/\s+/g, '');
+  if (v.startsWith('RP')) { v = v.substring(2); }
+  const m = v.match(/^(\d+(?:[.,]\d+)?)[KK]$/);
+  if (m) {
+    let angka = m[1].replace(',', '.');
+    return parseFloat(angka) * 1000;
+  }
+  let angkaMurni = v.replace(/[^0-9]/g, '');
+  const n = parseFloat(angkaMurni);
   return isNaN(n) ? 0 : n;
 }
+
 function paid(v) { return parseK(v) > 0; }
+
 function fmtRp(n) {
   if (n >= 1000000) return 'Rp ' + (n / 1000000).toFixed(1).replace('.0', '') + ' Jt';
   if (n >= 1000) return 'Rp ' + Math.round(n / 1000) + 'K';
@@ -297,6 +304,7 @@ function parseCSV(text) {
   const iNo = headers.findIndex(h => h === 'NO');
   const iBlok = headers.findIndex(h => h === 'BLOK');
   const iPem = headers.findIndex(h => h.includes('PEMILIK'));
+  const iSisa = headers.findIndex(h => h.includes('SISA')); // Cari kolom sisa
   const mIdx = MK.map(m => headers.findIndex(h => h === m));
   
   allRows = [];
@@ -310,8 +318,13 @@ function parseCSV(text) {
     if (!blok || blok === '0') continue;
     
     const no = (cols[iNo] || '').replace(/"/g, '').trim();
+    
+    // Tarik nilai sisa dari sheet
+    const sisaRaw = iSisa >= 0 ? (cols[iSisa] || '0').replace(/"/g, '').trim() : '0';
+    const sisa = parseK(sisaRaw); 
+
     const months = mIdx.map(mi => mi >= 0 ? (cols[mi] || '0K').replace(/"/g, '').trim() : '0K');
-    allRows.push({ no, blok, nama, months });
+    allRows.push({ no, blok, nama, months, sisa });
   }
 }
 
@@ -320,17 +333,20 @@ function buildUI() {
   if (total === 0) return;
   
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
-  const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
+  
+  // MERUJUK SISA: Menjumlahkan total seluruh nilai kolom sisa
+  const totalSisaKas = allRows.reduce((s, r) => s + r.sisa, 0);
+  
   const pct = Math.round(hasBayar / total * 100);
 
   document.getElementById('s-total').textContent = total;
-  document.getElementById('s-kas').textContent = fmtRp(kas);
-  document.getElementById('s-kas-sub').textContent = 'terkumpul';
+  document.getElementById('s-kas').textContent = fmtRp(totalSisaKas); // Taruh total sisa di dasbor kedua
   document.getElementById('s-bayar').textContent = hasBayar;
   document.getElementById('s-none').textContent = total - hasBayar;
+  
   setTimeout(() => { document.getElementById('prog-fill').style.width = pct + '%'; }, 100);
   document.getElementById('prog-left').textContent = hasBayar + ' dari ' + total + ' anggota (' + pct + '%)';
-  document.getElementById('prog-right').textContent = fmtRp(kas);
+  document.getElementById('prog-right').textContent = 'Total Sisa: ' + fmtRp(totalSisaKas);
 
   // Month pills
   const mp = document.getElementById('month-pills');
@@ -371,12 +387,18 @@ function render() {
     const dots = r.months.map((v, i) =>
       `<div class="dot ${paid(v) ? 'ok' : 'no'}" title="${MN[i]}: ${paid(v) ? fmtRp(parseK(v)) : 'Belum bayar'}">${MN[i].slice(0,1)}</div>`
     ).join('');
+    
     return `<tr>
       <td class="no-cell">${r.no}</td>
       <td><span class="blok-tag">${r.blok}</span></td>
       <td class="nama-cell">${r.nama}</td>
       <td><div class="dots">${dots}</div></td>
       <td class="total-cell">${total > 0 ? fmtRp(total) : '—'}</td>
+      
+      <td class="total-cell" style="color: ${r.sisa > 0 ? 'var(--red)' : 'var(--text3)'}">
+        ${r.sisa > 0 ? fmtRp(r.sisa) : '0'}
+      </td>
+      
       <td style="text-align:center"><span class="status-pill ${statusClass}">${statusText}</span></td>
     </tr>`;
   }).join('');
