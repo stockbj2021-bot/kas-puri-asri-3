@@ -18,6 +18,7 @@
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
+/* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:100}
 .logo-area{display:flex;align-items:center;gap:12px}
 .logo-circle{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1da876,#0a7c52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
@@ -30,12 +31,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .btn.primary:hover{background:#0a6b46}
 .last-update{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
 
+/* LAYOUT */
 .container{max-width:1200px;margin:0 auto;padding:1.5rem}
 
+/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
 .stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
-.stat-card .value{font-size:20px;font-weight:600;color:var(--text);line-height:1;font-family:'DM Mono',monospace;word-break:break-all}
+.stat-card .value{font-size:28px;font-weight:600;color:var(--text);line-height:1;font-family:'DM Mono',monospace}
 .stat-card .sub{font-size:11px;color:var(--text3);margin-top:4px}
 .stat-card.green{border-left:3px solid var(--green-mid)}
 .stat-card.green .value{color:var(--green)}
@@ -44,12 +47,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .stat-card.amber{border-left:3px solid #d4a017}
 .stat-card.amber .value{color:var(--amber)}
 
+/* SUMMARY BAR */
 .summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem}
 .summary-bar .bar-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
 .progress-track{height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));border-radius:999px;transition:width .6s ease}
 .bar-meta{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
 
+/* MONTH ROW */
 .month-section{margin-bottom:1.25rem}
 .month-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
 .month-pills{display:flex;gap:6px;flex-wrap:wrap}
@@ -60,6 +65,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .mpill .count{font-size:10px;font-family:'DM Mono',monospace;background:var(--bg);padding:1px 5px;border-radius:999px}
 .mpill.active .count{background:rgba(29,168,118,.15)}
 
+/* FILTER ROW */
 .filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
 .filter-row input{flex:1;min-width:200px;height:36px;border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:border .15s}
 .filter-row input:focus{border-color:#1da876}
@@ -67,12 +73,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .fbtn:hover{background:var(--bg)}
 .fbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
 
+/* BLOK FILTER */
 .blok-row{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap}
 .bbtn{padding:0 11px;height:28px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:11.5px;cursor:pointer;font-family:'DM Mono',monospace;color:var(--text2);font-weight:500;transition:all .15s}
 .bbtn:hover{background:var(--bg);border-color:var(--border2)}
 .bbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
 
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* TABLE */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto; /* <-- INI YANG DITAMBAHKAN AGAR BISA DIGESER */
+  -webkit-overflow-scrolling: touch; /* Biar gesernya mulus di HP Android/iPhone */
+}
 .table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
 .table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 .table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
@@ -91,19 +105,49 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .status-pill.partial{background:var(--amber-bg);color:var(--amber)}
 .status-pill.no{background:var(--red-bg);color:var(--red)}
 
+/* FOOTER */
 .tfoot{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);background:var(--bg)}
+
+/* LOADING / ERROR */
 .state-box{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.state-box .icon{font-size:32px;margin-bottom:12px}
+.state-box p{font-size:14px}
 .spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--green-mid);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .err-box{background:var(--red-bg);border:1px solid #f5c0b0;border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:13px;color:var(--red)}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .container{padding:1rem}
+  .header{padding:1rem}
+  .nama-cell{font-size:12px}
+  .dot{width:16px;height:16px;font-size:7.5px}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat-card .value{font-size:22px}
+}
+
+/* PRINT */
+@media print{
+  .header,.filter-row,.blok-row,.month-section,.btn,.fbtn,.bbtn,.mpill{display:none!important}
+  .table-wrap{border:1px solid #ccc}
+  body{background:#fff}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo-area">
-    <div class="logo-circle"><img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/></div>
-    <div class="logo-text"><h1>Kas Puri Asri 3</h1><p>RT 01 / RW 012 · TH.2026</p></div>
+    <div class="logo-circle">
+  <img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
+</div>
+    <div class="logo-text">
+      <h1>Kas Puri Asri 3</h1>
+      <p>RT 01 / RW 012 · TH.2026</p>
+    </div>
   </div>
   <div class="header-right">
     <span class="last-update" id="last-update"></span>
@@ -115,29 +159,41 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="container">
   <div id="err-box" class="err-box" style="display:none"></div>
   <div id="loading" class="state-box">
-    <div class="spinner"></div><p>Mengambil data dari Google Sheets...</p>
+    <div class="spinner"></div>
+    <p>Mengambil data dari Google Sheets...</p>
   </div>
 
   <div id="content" style="display:none">
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="label">Total Anggota</div><div class="value" id="s-total">—</div>
+        <div class="label">Total Anggota</div>
+        <div class="value" id="s-total">—</div>
+        <div class="sub">terdaftar</div>
       </div>
       <div class="stat-card green">
-        <div class="label">Total Masuk</div><div class="value" id="s-masuk">—</div>
-      </div>
-      <div class="stat-card red">
-        <div class="label">Total Keluar</div><div class="value" id="s-keluar">—</div>
+        <div class="label">Total Kas</div>
+        <div class="value" id="s-kas">—</div>
+        <div class="sub" id="s-kas-sub"></div>
       </div>
       <div class="stat-card amber">
-        <div class="label">Sisa Saldo</div><div class="value" id="s-sisa">—</div>
+        <div class="label">Ada Pembayaran</div>
+        <div class="value" id="s-bayar">—</div>
+        <div class="sub">anggota</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Belum Bayar</div>
+        <div class="value" id="s-none">—</div>
+        <div class="sub">anggota</div>
       </div>
     </div>
 
     <div class="summary-bar">
       <div class="bar-label">Persentase anggota yang sudah bayar</div>
       <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
-      <div class="bar-meta"><span id="prog-left"></span><span id="prog-right"></span></div>
+      <div class="bar-meta">
+        <span id="prog-left"></span>
+        <span id="prog-right"></span>
+      </div>
     </div>
 
     <div class="month-section">
@@ -158,7 +214,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <table>
         <thead>
           <tr>
-            <th style="width:36px">No</th><th style="width:76px">Blok</th><th>Pemilik</th>
+            <th style="width:36px">No</th>
+            <th style="width:76px">Blok</th>
+            <th>Pemilik</th>
             <th>Jan Feb Mar Apr Mei Jun Jul Agu Sep Okt Nov Des</th>
             <th style="text-align:right;width:80px">Total</th>
             <th style="text-align:center;width:68px">Status</th>
@@ -166,18 +224,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="tfoot"><span id="foot-count"></span><span id="foot-total"></span></div>
+      <div class="tfoot">
+        <span id="foot-count"></span>
+        <span id="foot-total"></span>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
+// Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
+
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 let allRows = [], filterMode = 'all', activeMonth = null, activeBlok = null;
-let valMasuk = '—', valKeluar = '—', valSisa = '—';
 
 function parseK(v) {
   if (!v) return 0;
@@ -194,6 +256,22 @@ function fmtRp(n) {
   return 'Rp ' + n;
 }
 
+function setFilter(f) {
+  filterMode = f;
+  ['all','bayar','none'].forEach(x => document.getElementById('fb-' + x).classList.toggle('on', x === f));
+  render();
+}
+function setMonth(m) {
+  activeMonth = activeMonth === m ? null : m;
+  document.querySelectorAll('.mpill').forEach(el => el.classList.toggle('active', el.dataset.m === activeMonth));
+  render();
+}
+function setBlok(b) {
+  activeBlok = activeBlok === b ? null : b;
+  document.querySelectorAll('.bbtn').forEach(el => el.classList.toggle('on', el.dataset.b === activeBlok));
+  render();
+}
+
 function splitLine(line) {
   const r = []; let cur = '', inQ = false;
   for (let i = 0; i < line.length; i++) {
@@ -208,19 +286,15 @@ function splitLine(line) {
 
 function parseCSV(text) {
   const lines = text.split('\n');
-  // Ambil Ringkasan dari Baris 3 (Index 2) dan Baris 5 (Index 4)
-  if(lines[2]) {
-    const cols3 = splitLine(lines[2]);
-    valMasuk = cols3[4] || '—';
-    valKeluar = cols3[13] || '—';
+  let hi = -1;
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    const rawLine = lines[i].toUpperCase();
+    if (rawLine.includes('PEMILIK') && rawLine.includes('BLOK')) { hi = i; break; }
   }
-  if(lines[4]) {
-    const cols5 = splitLine(lines[4]);
-    valSisa = cols5[5] || '—';
-  }
-
-  let hi = 6; // Asumsi header di baris 7
+  if (hi < 0) hi = 6;
+  
   const headers = splitLine(lines[hi]).map(h => h.replace(/"/g, '').trim().toUpperCase());
+  const iNo = headers.findIndex(h => h === 'NO');
   const iBlok = headers.findIndex(h => h === 'BLOK');
   const iPem = headers.findIndex(h => h.includes('PEMILIK'));
   const mIdx = MK.map(m => headers.findIndex(h => h === m));
@@ -230,48 +304,117 @@ function parseCSV(text) {
     if (!lines[i].trim()) continue;
     const cols = splitLine(lines[i]);
     const nama = (cols[iPem] || '').replace(/"/g, '').trim();
-    if (!nama || nama.toUpperCase().includes('TOTAL')) continue;
-    allRows.push({ no: cols[0], blok: cols[iBlok], nama, months: mIdx.map(mi => cols[mi] || '0K') });
+    
+    if (!nama || !isNaN(Number(nama)) || nama === '0' || nama.toUpperCase().includes('TOTAL')) continue;
+    const blok = (cols[iBlok] || '').replace(/"/g, '').trim();
+    if (!blok || blok === '0') continue;
+    
+    const no = (cols[iNo] || '').replace(/"/g, '').trim();
+    const months = mIdx.map(mi => mi >= 0 ? (cols[mi] || '0K').replace(/"/g, '').trim() : '0K');
+    allRows.push({ no, blok, nama, months });
   }
 }
 
 function buildUI() {
-  document.getElementById('s-total').textContent = allRows.length;
-  document.getElementById('s-masuk').textContent = valMasuk;
-  document.getElementById('s-keluar').textContent = valKeluar;
-  document.getElementById('s-sisa').textContent = valSisa;
+  const total = allRows.length;
+  if (total === 0) return;
   
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
-  const pct = Math.round(hasBayar / allRows.length * 100);
-  document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-left').textContent = hasBayar + ' dari ' + allRows.length + ' (' + pct + '%)';
-  document.getElementById('prog-right').textContent = 'Sisa: ' + valSisa;
+  const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
+  const pct = Math.round(hasBayar / total * 100);
 
-  // Month pills logic... (tetap sama)
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-kas').textContent = fmtRp(kas);
+  document.getElementById('s-kas-sub').textContent = 'terkumpul';
+  document.getElementById('s-bayar').textContent = hasBayar;
+  document.getElementById('s-none').textContent = total - hasBayar;
+  setTimeout(() => { document.getElementById('prog-fill').style.width = pct + '%'; }, 100);
+  document.getElementById('prog-left').textContent = hasBayar + ' dari ' + total + ' anggota (' + pct + '%)';
+  document.getElementById('prog-right').textContent = fmtRp(kas);
+
+  // Month pills
   const mp = document.getElementById('month-pills');
-  mp.innerHTML = MN.map((m, i) => `<button class="mpill" onclick="setMonth('${MK[i]}')">${m}</button>`).join('');
-  document.getElementById('last-update').textContent = 'Update: ' + new Date().toLocaleString('id-ID');
+  mp.innerHTML = MN.map((m, i) => {
+    const belum = allRows.filter(r => !paid(r.months[i])).length;
+    const many = belum > total * 0.6;
+    return `<button class="mpill${many ? ' many-missing' : ''}" data-m="${MK[i]}" onclick="setMonth('${MK[i]}')">${m} <span class="count">${belum} blm</span></button>`;
+  }).join('');
+
+  // Blok filter
+  const bloks = [...new Set(allRows.map(r => { const m = r.blok.match(/^[A-Za-z]+/); return m ? m[0].toUpperCase() : r.blok[0]; }))].sort();
+  document.getElementById('blok-row').innerHTML =
+    '<span style="font-size:11px;color:var(--text3);font-weight:500;align-self:center;margin-right:4px">Blok:</span>' +
+    bloks.map(b => `<button class="bbtn" data-b="${b}" onclick="setBlok('${b}')">${b}</button>`).join('');
+
+  // Last update
+  document.getElementById('last-update').textContent = 'Update: ' + new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-function setFilter(f) { filterMode = f; render(); }
-function setMonth(m) { activeMonth = (activeMonth === m) ? null : m; render(); }
 function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  let list = allRows.filter(r => {
+    const mq = r.nama.toLowerCase().includes(q) || r.blok.toLowerCase().includes(q);
+    const hasBayar = r.months.some(v => paid(v));
+    const mf = filterMode === 'all' || (filterMode === 'bayar' && hasBayar) || (filterMode === 'none' && !hasBayar);
+    const mi = activeMonth === null || !paid(r.months[MK.indexOf(activeMonth)]);
+    const mb = activeBlok === null || r.blok.toUpperCase().startsWith(activeBlok);
+    return mq && mf && mi && mb;
+  });
+
   const tbody = document.getElementById('tbody');
-  tbody.innerHTML = allRows.map(r => {
-    const dots = r.months.map((v, i) => `<div class="dot ${paid(v) ? 'ok' : 'no'}">${MN[i].slice(0,1)}</div>`).join('');
-    return `<tr><td>${r.no}</td><td>${r.blok}</td><td>${r.nama}</td><td><div class="dots">${dots}</div></td><td></td><td></td></tr>`;
+  tbody.innerHTML = list.map(r => {
+    const total = r.months.reduce((s, v) => s + parseK(v), 0);
+    const hasBayar = r.months.some(v => paid(v));
+    const allPaid = r.months.every(v => paid(v));
+    const statusClass = allPaid ? 'ok' : hasBayar ? 'partial' : 'no';
+    const statusText = allPaid ? 'Lunas' : hasBayar ? 'Sebagian' : 'Belum';
+    const dots = r.months.map((v, i) =>
+      `<div class="dot ${paid(v) ? 'ok' : 'no'}" title="${MN[i]}: ${paid(v) ? fmtRp(parseK(v)) : 'Belum bayar'}">${MN[i].slice(0,1)}</div>`
+    ).join('');
+    return `<tr>
+      <td class="no-cell">${r.no}</td>
+      <td><span class="blok-tag">${r.blok}</span></td>
+      <td class="nama-cell">${r.nama}</td>
+      <td><div class="dots">${dots}</div></td>
+      <td class="total-cell">${total > 0 ? fmtRp(total) : '—'}</td>
+      <td style="text-align:center"><span class="status-pill ${statusClass}">${statusText}</span></td>
+    </tr>`;
   }).join('');
+
+  const totalFiltered = list.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
+  document.getElementById('foot-count').textContent = `Menampilkan ${list.length} dari ${allRows.length} anggota`;
+  document.getElementById('foot-total').textContent = list.length !== allRows.length ? `Total filter: ${fmtRp(totalFiltered)}` : '';
 }
 
 async function init() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('err-box').style.display = 'none';
+  activeMonth = null; activeBlok = null; filterMode = 'all';
   try {
-    const res = await fetch(CSV_URL + '&t=' + new Date().getTime());
-    parseCSV(await res.text());
-    buildUI(); render();
+    const cacheBusterUrl = `${CSV_URL}&t=${new Date().getTime()}`;
+    const res = await fetch(cacheBusterUrl);
+    if (!res.ok) throw new Error('Gagal menarik data langsung dari Google Sheets.');
+    
+    const text = await res.text();
+    parseCSV(text);
+    
+    if (allRows.length === 0) {
+      throw new Error('Data gagal diproses. Kolom BLOK atau PEMILIK tidak ditemukan.');
+    }
+    
+    buildUI();
+    render();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
-  } catch (e) { alert('Gagal memuat data'); }
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('err-box').style.display = 'block';
+    document.getElementById('err-box').innerHTML = `⚠️ <strong>Error Pengambilan Data:</strong> ${e.message}`;
+  }
 }
+
 init();
 </script>
 </body>
