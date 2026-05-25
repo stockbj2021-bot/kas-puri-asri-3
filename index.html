@@ -8,8 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --green:#0a7c52;--green-bg:#e6f5ee;--green-mid:#1da876;
+:root{\n  --green:#0a7c52;--green-bg:#e6f5ee;--green-mid:#1da876;
   --red:#b5341a;--red-bg:#fdeee9;
   --amber:#8a5c00;--amber-bg:#fef3d8;
   --text:#1a1a18;--text2:#5c5c58;--text3:#9a9a94;
@@ -38,7 +37,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
 .stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
-.stat-card .value{font-size:28px;font-weight:600;color:var(--text);line-height:1;font-family:'DM Mono',monospace}
+.stat-card .value{font-size:23px;font-weight:600;color:var(--text);line-height:1;font-family:'DM Mono',monospace;word-break:break-all}
 .stat-card .sub{font-size:11px;color:var(--text3);margin-top:4px}
 .stat-card.green{border-left:3px solid var(--green-mid)}
 .stat-card.green .value{color:var(--green)}
@@ -84,8 +83,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow-x: auto; /* <-- INI YANG DITAMBAHKAN AGAR BISA DIGESER */
-  -webkit-overflow-scrolling: touch; /* Biar gesernya mulus di HP Android/iPhone */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
 .table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
@@ -126,7 +125,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 }
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr 1fr}
-  .stat-card .value{font-size:22px}
+  .stat-card .value{font-size:18px}
 }
 
 /* PRINT */
@@ -142,8 +141,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="header">
   <div class="logo-area">
     <div class="logo-circle">
-  <img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
-</div>
+      <img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
+    </div>
     <div class="logo-text">
       <h1>Kas Puri Asri 3</h1>
       <p>RT 01 / RW 012 · TH.2026</p>
@@ -171,19 +170,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <div class="sub">terdaftar</div>
       </div>
       <div class="stat-card green">
-        <div class="label">Total Kas</div>
-        <div class="value" id="s-kas">—</div>
-        <div class="sub" id="s-kas-sub"></div>
-      </div>
-      <div class="stat-card amber">
-        <div class="label">Ada Pembayaran</div>
-        <div class="value" id="s-bayar">—</div>
-        <div class="sub">anggota</div>
+        <div class="label">Total Masuk</div>
+        <div class="value" id="s-masuk">—</div>
+        <div class="sub">pemasukan (E3)</div>
       </div>
       <div class="stat-card red">
-        <div class="label">Belum Bayar</div>
-        <div class="value" id="s-none">—</div>
-        <div class="sub">anggota</div>
+        <div class="label">Total Keluar</div>
+        <div class="value" id="s-keluar">—</div>
+        <div class="sub">pengeluaran (M3)</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="label">Sisa Saldo</div>
+        <div class="value" id="s-sisa-saldo">—</div>
+        <div class="sub">aktual (F5)</div>
       </div>
     </div>
 
@@ -204,7 +203,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="blok-row" id="blok-row"></div>
 
     <div class="filter-row">
-      <input type="text" id="search" placeholder="🔍  Cari nama atau blok..." oninput="render()"/>
+      <input type="text" id="search" placeholder="🔍 Cari nama atau blok..." oninput="render()"/>
       <button class="fbtn on" id="fb-all" onclick="setFilter('all')">Semua</button>
       <button class="fbtn" id="fb-bayar" onclick="setFilter('bayar')">Ada Bayaran</button>
       <button class="fbtn" id="fb-none" onclick="setFilter('none')">Belum Bayar</button>
@@ -233,13 +232,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-// Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
 
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 let allRows = [], filterMode = 'all', activeMonth = null, activeBlok = null;
+
+// VARIABEL PENAMPUNG DATA HISTORIS DARI SHEET ATAS
+let dataMasukDariSheet = '—';
+let dataKeluarDariSheet = '—';
+let dataSisaDariSheet = '—';
 
 function parseK(v) {
   if (!v) return 0;
@@ -286,6 +289,20 @@ function splitLine(line) {
 
 function parseCSV(text) {
   const lines = text.split('\n');
+  
+  // Ambil Baris ke-3 (Indeks 2) untuk Total Masuk (Kolom E / Indeks 4) dan Total Keluar (Kolom N / Indeks 13)
+  if (lines.length >= 3) {
+    const colsBarisTiga = splitLine(lines[2]);
+    if (colsBarisTiga[4]) dataMasukDariSheet = colsBarisTiga[4].replace(/"/g, '').trim();
+    if (colsBarisTiga[13]) dataKeluarDariSheet = colsBarisTiga[13].replace(/"/g, '').trim();
+  }
+  
+  // Ambil Baris ke-5 (Indeks 4) untuk Sisa Saldo Aktual (Kolom F / Indeks 5)
+  if (lines.length >= 5) {
+    const colsBarisLima = splitLine(lines[4]);
+    if (colsBarisLima[5]) dataSisaDariSheet = colsBarisLima[5].replace(/"/g, '').trim();
+  }
+  
   let hi = -1;
   for (let i = 0; i < Math.min(15, lines.length); i++) {
     const rawLine = lines[i].toUpperCase();
@@ -320,19 +337,18 @@ function buildUI() {
   if (total === 0) return;
   
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
-  const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
   const pct = Math.round(hasBayar / total * 100);
 
+  // Suntik langsung teks nominal asli dari Google Sheets
   document.getElementById('s-total').textContent = total;
-  document.getElementById('s-kas').textContent = fmtRp(kas);
-  document.getElementById('s-kas-sub').textContent = 'terkumpul';
-  document.getElementById('s-bayar').textContent = hasBayar;
-  document.getElementById('s-none').textContent = total - hasBayar;
+  document.getElementById('s-masuk').textContent = dataMasukDariSheet;
+  document.getElementById('s-keluar').textContent = dataKeluarDariSheet;
+  document.getElementById('s-sisa-saldo').textContent = dataSisaDariSheet;
+  
   setTimeout(() => { document.getElementById('prog-fill').style.width = pct + '%'; }, 100);
   document.getElementById('prog-left').textContent = hasBayar + ' dari ' + total + ' anggota (' + pct + '%)';
-  document.getElementById('prog-right').textContent = fmtRp(kas);
+  document.getElementById('prog-right').textContent = 'Sisa: ' + dataSisaDariSheet;
 
-  // Month pills
   const mp = document.getElementById('month-pills');
   mp.innerHTML = MN.map((m, i) => {
     const belum = allRows.filter(r => !paid(r.months[i])).length;
@@ -340,13 +356,11 @@ function buildUI() {
     return `<button class="mpill${many ? ' many-missing' : ''}" data-m="${MK[i]}" onclick="setMonth('${MK[i]}')">${m} <span class="count">${belum} blm</span></button>`;
   }).join('');
 
-  // Blok filter
   const bloks = [...new Set(allRows.map(r => { const m = r.blok.match(/^[A-Za-z]+/); return m ? m[0].toUpperCase() : r.blok[0]; }))].sort();
   document.getElementById('blok-row').innerHTML =
     '<span style="font-size:11px;color:var(--text3);font-weight:500;align-self:center;margin-right:4px">Blok:</span>' +
     bloks.map(b => `<button class="bbtn" data-b="${b}" onclick="setBlok('${b}')">${b}</button>`).join('');
 
-  // Last update
   document.getElementById('last-update').textContent = 'Update: ' + new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
@@ -411,7 +425,7 @@ async function init() {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('err-box').style.display = 'block';
-    document.getElementById('err-box').innerHTML = `⚠️ <strong>Error Pengambilan Data:</strong> ${e.message}`;
+    document.getElementById('err-box').innerHTML = `⚠️ <strong>Error Pengambilan Data:</strong> \${e.message}`;
   }
 }
 
