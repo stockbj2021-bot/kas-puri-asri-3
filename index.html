@@ -80,7 +80,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .bbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
 
 /* TABLE */
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto; /* <-- INI YANG DITAMBAHKAN AGAR BISA DIGESER */
+  -webkit-overflow-scrolling: touch; /* Biar gesernya mulus di HP Android/iPhone */
+}
 .table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
 .table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 .table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
