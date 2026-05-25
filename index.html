@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kas Puri Asri 3 — TH.2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600&family=DM+Mono:wght=400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -225,8 +225,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-// PENTING: Ganti teks di bawah ini dengan URL Web App dari Google Apps Script Anda!
-const CSV_URL = 'https://script.google.com/macros/s/AKfycbzhouZXsV8DHDTdZ_hLW_TIRseK2fo-aZBAvwjvgbkl2QjbQtuJ9MHqO3wNAvXqDJqDaA/exec';
+// Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
 
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -277,24 +277,30 @@ function splitLine(line) {
 }
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
+  const lines = text.split('\n');
   let hi = -1;
-  for (let i = 0; i < Math.min(12, lines.length); i++) {
-    if (lines[i].toUpperCase().includes('PEMILIK') && lines[i].toUpperCase().includes('BLOK')) { hi = i; break; }
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    const rawLine = lines[i].toUpperCase();
+    if (rawLine.includes('PEMILIK') && rawLine.includes('BLOK')) { hi = i; break; }
   }
   if (hi < 0) hi = 6;
+  
   const headers = splitLine(lines[hi]).map(h => h.replace(/"/g, '').trim().toUpperCase());
   const iNo = headers.findIndex(h => h === 'NO');
   const iBlok = headers.findIndex(h => h === 'BLOK');
   const iPem = headers.findIndex(h => h.includes('PEMILIK'));
   const mIdx = MK.map(m => headers.findIndex(h => h === m));
+  
   allRows = [];
-  for (let i = hi + 2; i < lines.length; i++) {
+  for (let i = hi + 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
     const cols = splitLine(lines[i]);
     const nama = (cols[iPem] || '').replace(/"/g, '').trim();
-    if (!nama || !isNaN(Number(nama)) || nama === '0') continue;
+    
+    if (!nama || !isNaN(Number(nama)) || nama === '0' || nama.toUpperCase().includes('TOTAL')) continue;
     const blok = (cols[iBlok] || '').replace(/"/g, '').trim();
     if (!blok || blok === '0') continue;
+    
     const no = (cols[iNo] || '').replace(/"/g, '').trim();
     const months = mIdx.map(mi => mi >= 0 ? (cols[mi] || '0K').replace(/"/g, '').trim() : '0K');
     allRows.push({ no, blok, nama, months });
@@ -303,6 +309,8 @@ function parseCSV(text) {
 
 function buildUI() {
   const total = allRows.length;
+  if (total === 0) return;
+  
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
   const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
   const pct = Math.round(hasBayar / total * 100);
@@ -376,21 +384,29 @@ async function init() {
   document.getElementById('err-box').style.display = 'none';
   activeMonth = null; activeBlok = null; filterMode = 'all';
   try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error();
+    const cacheBusterUrl = `${CSV_URL}&t=${new Date().getTime()}`;
+    const res = await fetch(cacheBusterUrl);
+    if (!res.ok) throw new Error('Gagal menarik data langsung dari Google Sheets.');
+    
     const text = await res.text();
     parseCSV(text);
-    if (!allRows.length) throw new Error('empty');
+    
+    if (allRows.length === 0) {
+      throw new Error('Data gagal diproses. Kolom BLOK atau PEMILIK tidak ditemukan.');
+    }
+    
     buildUI();
     render();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
   } catch (e) {
+    console.error(e);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('err-box').style.display = 'block';
-    document.getElementById('err-box').innerHTML = '⚠️ Gagal mengambil data. Pastikan Web App Google Script Anda sudah di-deploy sebagai "Anyone", atau coba klik tombol Refresh kembali.';
+    document.getElementById('err-box').innerHTML = `⚠️ <strong>Error Pengambilan Data:</strong> ${e.message}`;
   }
 }
+
 init();
 </script>
 </body>
