@@ -170,7 +170,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <div class="value" id="s-total">—</div>
         <div class="sub">terdaftar</div>
       </div>
-      <div class="stat-card green"> <div class="label">Total Sisa Saldo</div> <div class="value" id="s-kas">—</div>
+      <div class="stat-card green"> 
+        <div class="label">Total Sisa Saldo</div> 
+        <div class="value" id="s-kas">—</div>
         <div class="sub" id="s-kas-sub">di kas</div>
       </div>
       <div class="stat-card amber">
@@ -217,7 +219,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             <th>Pemilik</th>
             <th>Jan Feb Mar Apr Mei Jun Jul Agu Sep Okt Nov Des</th>
             <th style="text-align:right;width:80px">Total</th>
-            <th style="text-align:right;width:80px">Sisa Saldo</th> <th style="text-align:center;width:68px">Status</th>
+            <th style="text-align:right;width:80px">Sisa Saldo</th> 
+            <th style="text-align:center;width:68px">Status</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -238,36 +241,20 @@ const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','D
 
 let allRows = [], filterMode = 'all', activeMonth = null, activeBlok = null;
 
-// Fungsi pembersih nominal yang sudah diperbaiki untuk mengenali format titik ribuan Indonesia
+// Fungsi pembersih nominal super cepat & akurat untuk segala format angka (K maupun Titik Jutaan)
 function parseK(v) {
   if (!v) return 0;
-  // Ubah ke teks, bersihkan spasi baku, jadikan huruf kapital
-  v = v.toString().trim().toUpperCase().replace(/"/g, '').replace(/\s+/g, '');
+  v = v.toString().trim().toUpperCase().replace(/"/g, '');
   
-  if (v.startsWith('RP')) { v = v.substring(2); }
-  
-  // Format singkatan "K" (Contoh: 50K atau 50.5K)
-  const m = v.match(/^(\d+(?:[.,]\d+)?)[KK]$/);
-  if (m) {
-    let angka = m[1].replace(',', '.');
-    return parseFloat(angka) * 1000;
+  // 1. Jika format akhiran "K" (Contoh: 50K atau 50.5K)
+  if (v.endsWith('K')) {
+    let angka = v.replace('K', '').replace('RP', '').trim();
+    return parseFloat(angka.replace(',', '.')) * 1000;
   }
   
-  // Deteksi format titik ribuan penuh Indonesia (Contoh: 8.300.000 atau 50.000)
-  // Jika formatnya ribuan murni dengan titik, kita hapus titiknya agar menjadi angka JavaScript normal
-  if (v.includes('.') && !v.includes(',')) {
-    // Memastikan ini titik ribuan, bukan titik desimal (misal panjang angka di belakang titik adalah 3 digit)
-    let parts = v.split('.');
-    if (parts.length > 1 && parts[parts.length - 1].length === 3) {
-      v = v.replace(/\./g, '');
-    }
-  } else if (v.includes(',')) {
-    // Jika menggunakan format koma desimal, sesuaikan ke standar internasional titik desimal
-    v = v.replace(/\./g, '').replace(',', '.');
-  }
-  
-  let angkaMurni = v.replace(/[^0-9.]/g, '');
-  const n = parseFloat(angkaMurni);
+  // 2. Jika format nominal penuh Indonesia menggunakan titik ribuan (Contoh: 8.300.000 atau 50.000)
+  let bersih = v.replace('RP', '').replace(/\./g, '').replace(',', '.').trim();
+  const n = parseFloat(bersih);
   return isNaN(n) ? 0 : n;
 }
 
@@ -297,4 +284,157 @@ function setBlok(b) {
 function splitLine(line) {
   const r = []; let cur = '', inQ = false;
   for (let i = 0; i < line.length; i++) {
-    const c
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { r.push(cur.trim()); cur = ''; }
+    else { cur += c; }
+  }
+  r.push(cur.trim());
+  return r;
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n');
+  let hi = -1;
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    const rawLine = lines[i].toUpperCase();
+    if (rawLine.includes('PEMILIK') && rawLine.includes('BLOK')) { hi = i; break; }
+  }
+  if (hi < 0) hi = 6;
+  
+  const headers = splitLine(lines[hi]).map(h => h.replace(/"/g, '').trim().toUpperCase());
+  const iNo = headers.findIndex(h => h === 'NO');
+  const iBlok = headers.findIndex(h => h === 'BLOK');
+  const iPem = headers.findIndex(h => h.includes('PEMILIK'));
+  const iSisa = headers.findIndex(h => h.includes('SISA')); 
+  const mIdx = MK.map(m => headers.findIndex(h => h === m));
+  
+  allRows = [];
+  for (let i = hi + 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const cols = splitLine(lines[i]);
+    const nama = (cols[iPem] || '').replace(/"/g, '').trim();
+    
+    if (!nama || !isNaN(Number(nama)) || nama === '0' || nama.toUpperCase().includes('TOTAL')) continue;
+    const blok = (cols[iBlok] || '').replace(/"/g, '').trim();
+    if (!blok || blok === '0') continue;
+    
+    const no = (cols[iNo] || '').replace(/"/g, '').trim();
+    
+    const sisaRaw = iSisa >= 0 ? (cols[iSisa] || '0').replace(/"/g, '').trim() : '0';
+    const sisa = parseK(sisaRaw);
+
+    const months = mIdx.map(mi => mi >= 0 ? (cols[mi] || '0K').replace(/"/g, '').trim() : '0K');
+    allRows.push({ no, blok, nama, months, sisa });
+  }
+}
+
+function buildUI() {
+  const total = allRows.length;
+  if (total === 0) return;
+  
+  const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
+  const totalSisaKas = allRows.reduce((s, r) => s + r.sisa, 0);
+  const pct = Math.round(hasBayar / total * 100);
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-kas').textContent = fmtRp(totalSisaKas); 
+  document.getElementById('s-kas-sub').textContent = 'di kas';
+  document.getElementById('s-bayar').textContent = hasBayar;
+  document.getElementById('s-none').textContent = total - hasBayar;
+  setTimeout(() => { document.getElementById('prog-fill').style.width = pct + '%'; }, 100);
+  document.getElementById('prog-left').textContent = hasBayar + ' dari ' + total + ' anggota (' + pct + '%)';
+  document.getElementById('prog-right').textContent = 'Total Sisa Saldo: ' + fmtRp(totalSisaKas);
+
+  // Month pills
+  const mp = document.getElementById('month-pills');
+  mp.innerHTML = MN.map((m, i) => {
+    const belum = allRows.filter(r => !paid(r.months[i])).length;
+    const many = belum > total * 0.6;
+    return `<button class="mpill${many ? ' many-missing' : ''}" data-m="${MK[i]}" onclick="setMonth('${MK[i]}')">${m} <span class="count">${belum} blm</span></button>`;
+  }).join('');
+
+  // Blok filter
+  const bloks = [...new Set(allRows.map(r => { const m = r.blok.match(/^[A-Za-z]+/); return m ? m[0].toUpperCase() : r.blok[0]; }))].sort();
+  document.getElementById('blok-row').innerHTML =
+    '<span style="font-size:11px;color:var(--text3);font-weight:500;align-self:center;margin-right:4px">Blok:</span>' +
+    bloks.map(b => `<button class="bbtn" data-b="${b}" onclick="setBlok('${b}')">${b}</button>`).join('');
+
+  // Last update
+  document.getElementById('last-update').textContent = 'Update: ' + new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  let list = allRows.filter(r => {
+    const mq = r.nama.toLowerCase().includes(q) || r.blok.toLowerCase().includes(q);
+    const hasBayar = r.months.some(v => paid(v));
+    const mf = filterMode === 'all' || (filterMode === 'bayar' && hasBayar) || (filterMode === 'none' && !hasBayar);
+    const mi = activeMonth === null || !paid(r.months[MK.indexOf(activeMonth)]);
+    const mb = activeBlok === null || r.blok.toUpperCase().startsWith(activeBlok);
+    return mq && mf && mi && mb;
+  });
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = list.map(r => {
+    const total = r.months.reduce((s, v) => s + parseK(v), 0);
+    const hasBayar = r.months.some(v => paid(v));
+    const allPaid = r.months.every(v => paid(v));
+    const statusClass = allPaid ? 'ok' : hasBayar ? 'partial' : 'no';
+    const statusText = allPaid ? 'Lunas' : hasBayar ? 'Sebagian' : 'Belum';
+    const dots = r.months.map((v, i) =>
+      `<div class="dot ${paid(v) ? 'ok' : 'no'}" title="${MN[i]}: ${paid(v) ? fmtRp(parseK(v)) : 'Belum bayar'}">${MN[i].slice(0,1)}</div>`
+    ).join('');
+    return `<tr>
+      <td class="no-cell">${r.no}</td>
+      <td><span class="blok-tag">${r.blok}</span></td>
+      <td class="nama-cell">${r.nama}</td>
+      <td><div class="dots">${dots}</div></td>
+      <td class="total-cell">${total > 0 ? fmtRp(total) : '—'}</td>
+      
+      <td class="total-cell" style="color: ${r.sisa > 0 ? 'var(--green)' : 'var(--text3)'}">
+        ${r.sisa > 0 ? fmtRp(r.sisa) : '0'}
+      </td>
+      
+      <td style="text-align:center"><span class="status-pill ${statusClass}">${statusText}</span></td>
+    </tr>`;
+  }).join('');
+
+  const totalFiltered = list.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
+  document.getElementById('foot-count').textContent = `Menampilkan ${list.length} dari ${allRows.length} anggota`;
+  document.getElementById('foot-total').textContent = list.length !== allRows.length ? `Total filter: ${fmtRp(totalFiltered)}` : '';
+}
+
+async function init() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('err-box').style.display = 'none';
+  activeMonth = null; activeBlok = null; filterMode = 'all';
+  try {
+    const cacheBusterUrl = `${CSV_URL}&t=${new Date().getTime()}`;
+    const res = await fetch(cacheBusterUrl);
+    if (!res.ok) throw new Error('Gagal menarik data langsung dari Google Sheets.');
+    
+    const text = await res.text();
+    parseCSV(text);
+    
+    if (allRows.length === 0) {
+      throw new Error('Data gagal diproses. Kolom BLOK atau PEMILIK tidak ditemukan.');
+    }
+    
+    buildUI();
+    render();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('err-box').style.display = 'block';
+    document.getElementById('err-box').innerHTML = `⚠️ <strong>Error Pengambilan Data:</strong> ${e.message}`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
