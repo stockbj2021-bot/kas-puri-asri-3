@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kas Puri Asri 3 — TH.2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600&family=DM+Mono:wght=400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -156,7 +156,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 
   <div id="content" style="display:none">
-    <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="label">Total Anggota</div>
@@ -180,7 +179,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       </div>
     </div>
 
-    <!-- PROGRESS BAR -->
     <div class="summary-bar">
       <div class="bar-label">Persentase anggota yang sudah bayar</div>
       <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
@@ -190,16 +188,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       </div>
     </div>
 
-    <!-- MONTH FILTER -->
     <div class="month-section">
       <div class="month-section-title">Filter bulan — klik untuk lihat yang belum bayar</div>
       <div class="month-pills" id="month-pills"></div>
     </div>
 
-    <!-- BLOK FILTER -->
     <div class="blok-row" id="blok-row"></div>
 
-    <!-- SEARCH + FILTER -->
     <div class="filter-row">
       <input type="text" id="search" placeholder="🔍  Cari nama atau blok..." oninput="render()"/>
       <button class="fbtn on" id="fb-all" onclick="setFilter('all')">Semua</button>
@@ -207,7 +202,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <button class="fbtn" id="fb-none" onclick="setFilter('none')">Belum Bayar</button>
     </div>
 
-    <!-- TABLE -->
     <div class="table-wrap">
       <table>
         <thead>
@@ -230,8 +224,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
-<script>const CSV_URL = 'https://docs.google.com/spreadsheets/d/16g8v47u4b-HIsyOAn3_fH76_o3g-6KoxU6_vscfHhSg/export?format=csv';
-const PROXY = 'https://api.allorigins.win/raw?url=';
+<script>
+// PENTING: Ganti teks di bawah ini dengan URL Web App dari Google Apps Script Anda!
+const CSV_URL = 'https://script.google.com/macros/s/AKfycbzhouZXsV8DHDTdZ_hLW_TIRseK2fo-aZBAvwjvgbkl2QjbQtuJ9MHqO3wNAvXqDJqDaA/exec';
+
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
@@ -380,7 +376,6 @@ async function init() {
   document.getElementById('err-box').style.display = 'none';
   activeMonth = null; activeBlok = null; filterMode = 'all';
   try {
-    // Mengambil data langsung menggunakan link ekspor resmi (Bypass CORS)
     const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error();
     const text = await res.text();
@@ -391,24 +386,12 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
   } catch (e) {
-    // Fallback otomatis jika terjadi kendala jaringan lokal
-    try {
-      const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(CSV_URL));
-      if (!res.ok) throw new Error();
-      const text = await res.text();
-      parseCSV(text);
-      if (!allRows.length) throw new Error('empty');
-      buildUI();
-      render();
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-    } catch (err) {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('err-box').style.display = 'block';
-      document.getElementById('err-box').innerHTML = '⚠️ Gagal memuat data. Pastikan Google Sheets Anda telah "Dipublikasikan ke Web" dengan akses publik (Anyone with the link), lalu klik <strong>Refresh</strong>.';
-    }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('err-box').style.display = 'block';
+    document.getElementById('err-box').innerHTML = '⚠️ Gagal mengambil data. Pastikan Web App Google Script Anda sudah di-deploy sebagai "Anyone", atau coba klik tombol Refresh kembali.';
   }
-}init();
+}
+init();
 </script>
 </body>
 </html>
