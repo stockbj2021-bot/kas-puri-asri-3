@@ -325,7 +325,7 @@ function buildUI() {
 
   document.getElementById('s-total').textContent = total;
   document.getElementById('s-kas').textContent = fmtRp(kas);
-  document.getElementById('s-kas-sub').textContent = 'terkumpul';
+  document.getElementById('s-kas-sub').textContent = 'terkumpul tahun ini';
   document.getElementById('s-bayar').textContent = hasBayar;
   document.getElementById('s-none').textContent = total - hasBayar;
   setTimeout(() => { document.getElementById('prog-fill').style.width = pct + '%'; }, 100);
