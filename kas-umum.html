@@ -337,59 +337,70 @@ function parseFinance(text) {
   const lines = text.split('\n');
   let masuk = 0, keluar = 0, sisa = 0;
 
+  // Log semua baris mentah untuk debug
   for (let i = 0; i < Math.min(15, lines.length); i++) {
-    const upper = lines[i].toUpperCase();
-    const cols = splitLine(lines[i]);
+    console.log('[CSV row ' + i + ']', lines[i]);
+  }
 
-    // Dari foto sheet: baris MASUK dan KELUAR ada di baris yang SAMA
-    // Format: ..., MASUK>, [nilai masuk], ..., KELUAR, [nilai keluar], ...
-    if (upper.includes('MASUK') && upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
-      let foundMasuk = false;
-      for (let c = 0; c < cols.length; c++) {
-        const cellUp = cols[c].toUpperCase().replace(/"/g,'').trim();
-        if (cellUp.includes('MASUK')) { foundMasuk = true; continue; }
-        if (cellUp.includes('KELUAR')) { foundMasuk = false; }
-        const val = parseRp(cols[c]);
-        if (val > 0) {
-          if (foundMasuk && masuk === 0) { masuk = val; foundMasuk = false; }
-          else if (!foundMasuk && keluar === 0 && masuk > 0) { keluar = val; }
-        }
-      }
-    }
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    const raw   = lines[i];
+    const upper = raw.toUpperCase();
+    const cols  = splitLine(raw);
 
-    // Baris MASUK saja (tanpa KELUAR di baris yang sama)
-    if (upper.includes('MASUK') && !upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
-      let take = false;
-      for (let c = 0; c < cols.length; c++) {
-        if (cols[c].toUpperCase().includes('MASUK')) { take = true; continue; }
-        const val = parseRp(cols[c]);
-        if (take && val > 0) { masuk = val; break; }
-      }
-    }
+    // Lewati baris yang mengandung TOTAL MASUK / BULAN (baris ringkasan per bulan)
+    if (upper.includes('TOTAL') && upper.includes('MASUK') && upper.includes('BULAN')) continue;
 
-    // Baris KELUAR saja
-    if (upper.includes('KELUAR') && !upper.includes('MASUK') && !upper.includes('PEMILIK')) {
-      let take = false;
-      for (let c = 0; c < cols.length; c++) {
-        if (cols[c].toUpperCase().includes('KELUAR')) { take = true; continue; }
-        const val = parseRp(cols[c]);
-        if (take && val > 0) { keluar = val; break; }
-      }
-    }
-
-    // Baris SISA / SALDO
+    // Baris SISA / SALDO — cari dulu karena paling mudah diidentifikasi
     if ((upper.includes('SISA') || upper.includes('SALDO')) && !upper.includes('PEMILIK')) {
       for (let c = 0; c < cols.length; c++) {
         const val = parseRp(cols[c]);
-        if (val > 0 && val > sisa) sisa = val;
+        if (val > 100000) { sisa = val; break; }
       }
+      console.log('[Finance] SISA row', i, '→', sisa);
+    }
+
+    // Baris yang ada MASUK (dan bukan baris TOTAL/BULAN/PEMILIK)
+    if (upper.includes('MASUK') && !upper.includes('PEMILIK') && !upper.includes('BULAN')) {
+      // Scan seluruh kolom, ambil nilai terbesar (nilai MASUK biasanya paling besar di baris ini)
+      let best = 0;
+      for (let c = 0; c < cols.length; c++) {
+        const val = parseRp(cols[c]);
+        if (val > best) best = val;
+      }
+      // Kalau ada KELUAR di baris yang sama, nilai masuk adalah yg PERTAMA ditemukan setelah kata MASUK
+      if (upper.includes('KELUAR')) {
+        let afterMasuk = false, afterKeluar = false;
+        let tmpMasuk = 0, tmpKeluar = 0;
+        for (let c = 0; c < cols.length; c++) {
+          const cu = cols[c].toUpperCase().replace(/"/g,'').trim();
+          if (cu.includes('MASUK'))  { afterMasuk = true;  afterKeluar = false; continue; }
+          if (cu.includes('KELUAR')) { afterKeluar = true; afterMasuk  = false; continue; }
+          const val = parseRp(cols[c]);
+          if (afterMasuk  && val > 100000 && tmpMasuk  === 0) tmpMasuk  = val;
+          if (afterKeluar && val > 100000 && tmpKeluar === 0) tmpKeluar = val;
+        }
+        if (tmpMasuk  > 0) masuk  = tmpMasuk;
+        if (tmpKeluar > 0) keluar = tmpKeluar;
+        console.log('[Finance] MASUK+KELUAR row', i, '→ masuk:', masuk, 'keluar:', keluar);
+      } else {
+        // Hanya ada MASUK, ambil nilai terbesar
+        if (best > masuk) masuk = best;
+        console.log('[Finance] MASUK only row', i, '→', masuk);
+      }
+    }
+
+    // Baris KELUAR saja (tanpa MASUK)
+    if (upper.includes('KELUAR') && !upper.includes('MASUK') && !upper.includes('PEMILIK')) {
+      for (let c = 0; c < cols.length; c++) {
+        const val = parseRp(cols[c]);
+        if (val > 100000 && val > keluar) keluar = val;
+      }
+      console.log('[Finance] KELUAR only row', i, '→', keluar);
     }
   }
 
-  // Jika sisa terbaca langsung dari sheet, pakai itu; kalau tidak, hitung manual
   if (sisa === 0 && masuk > 0) sisa = masuk - keluar;
-
-  console.log('[Finance] masuk:', masuk, '| keluar:', keluar, '| sisa:', sisa);
+  console.log('[Finance FINAL] masuk:', masuk, '| keluar:', keluar, '| sisa:', sisa);
   return { masuk, keluar, sisa };
 }
 
