@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kas Puri Asri 3 — TH.2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#0a7c52;--green-bg:#e6f5ee;--green-mid:#1da876;
+  --red:#b5341a;--red-bg:#fdeee9;
+  --amber:#8a5c00;--amber-bg:#fef3d8;
+  --text:#1a1a18;--text2:#5c5c58;--text3:#9a9a94;
+  --bg:#f7f6f2;--surface:#ffffff;--border:#e8e6df;--border2:#d4d1c8;
+  --radius:10px;--radius-lg:14px;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER & NAV */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:100}
+.logo-area{display:flex;align-items:center;gap:12px}
+.logo-circle{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1da876,#0a7c52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.logo-text h1{font-size:16px;font-weight:600;color:var(--text);line-height:1.2}
+.logo-text p{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace}
+.header-right{display:flex;align-items:center;gap:8px}
+
+/* Hamburger Menu Styles */
+.menu-container { position: relative; }
+.menu-btn { cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); }
+.menu-btn span { display: block; width: 18px; height: 2px; background: var(--text2); }
+#nav-menu { position: absolute; top: 110%; right: 0; background: var(--surface); border: 1px solid var(--border2); padding: 10px; display: none; flex-direction: column; gap: 8px; border-radius: var(--radius); box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 150px; }
+#nav-menu.active { display: flex; }
+#nav-menu a { text-decoration: none; color: var(--text); font-size: 13px; font-weight: 500; padding: 5px 0; }
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:34px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12.5px;font-family:inherit;cursor:pointer;font-weight:500;transition:all .15s}
+.btn:hover{background:var(--bg);border-color:var(--border2)}
+.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.primary:hover{background:#0a6b46}
+.last-update{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace; margin-right: 5px;}
+
+/* LAYOUT & REST OF STYLES (Disingkat agar tidak terlalu panjang) */
+.container{max-width:1200px;margin:0 auto;padding:1.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
+.stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;font-weight:500}
+.stat-card .value{font-size:28px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.progress-track{height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));transition:width .6s ease}
+.month-section{margin-bottom:1.25rem}
+.mpill{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:30px;border-radius:999px;border:1px solid var(--border2);background:var(--surface);font-size:12px;cursor:pointer;margin: 3px}
+.mpill.active{background:var(--green-bg);border-color:var(--green-mid);color:var(--green)}
+.filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-row input{flex:1;min-width:200px;height:36px;border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px}
+.fbtn{padding:0 13px;height:36px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);cursor:pointer}
+.fbtn.on{background:var(--text);color:#fff}
+.blok-row{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap}
+.bbtn{padding:0 11px;height:28px;border-radius:999px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
+.bbtn.on{background:var(--text);color:#fff}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;color:var(--text3);text-transform:uppercase}
+.table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.status-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px}
+.status-pill.ok{background:var(--green-bg);color:var(--green)}
+.status-pill.partial{background:var(--amber-bg);color:var(--amber)}
+.status-pill.no{background:var(--red-bg);color:var(--red)}
+.tfoot{padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);background:var(--bg)}
+.state-box{text-align:center;padding:3rem 1rem}
+.err-box{background:var(--red-bg);border:1px solid #f5c0b0;padding:1rem;margin-bottom:1.25rem;border-radius:var(--radius-lg)}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media print{.header,.filter-row,.blok-row,.month-section,.btn,.fbtn,.bbtn,.mpill{display:none!important}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-circle"><img src="Logo RT11.png" alt="Logo" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/></div>
+    <div class="logo-text">
+      <h1>Kas Puri Asri 3</h1>
+      <p>RT 01 / RW 012 · TH.2026</p>
+    </div>
+  </div>
+  
+  <div class="header-right">
+    <span class="last-update" id="last-update"></span>
+    <button class="btn" onclick="init()">↺</button>
+    
+    <div class="menu-container">
+      <div class="menu-btn" onclick="document.getElementById('nav-menu').classList.toggle('active')">
+        <span></span><span></span><span></span>
+      </div>
+      <nav id="nav-menu">
+        <a href="index.html">Beranda</a>
+        <a href="kas-umum.html">Laporan Kas Umum</a>
+        <a href="kematian.html">Laporan Kas Kematian</a>
+      </nav>
+    </div>
+    
+    <button class="btn primary" onclick="window.print()">⎙ Cetak</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="err-box" class="err-box" style="display:none"></div>
+  <div id="loading" class="state-box">
+    <div class="spinner"></div>
+    <p>Mengambil data dari Google Sheets...</p>
+  </div>
+
+  <div id="content" style="display:none">
+    </div>
+</div>
+
+<script>
+// (Fungsi JavaScript kamu tetap sama)
+</script>
+</body>
+</html>
