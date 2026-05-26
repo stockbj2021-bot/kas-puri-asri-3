@@ -18,90 +18,206 @@
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-/* HEADER & NAV */
+/* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:100}
 .logo-area{display:flex;align-items:center;gap:12px}
 .logo-circle{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1da876,#0a7c52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
 .logo-text h1{font-size:16px;font-weight:600;color:var(--text);line-height:1.2}
 .logo-text p{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace}
 .header-right{display:flex;align-items:center;gap:8px}
-
-/* Hamburger Menu Styles */
-.menu-container { position: relative; }
-.menu-btn { cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); }
-.menu-btn span { display: block; width: 18px; height: 2px; background: var(--text2); }
-#nav-menu { position: absolute; top: 110%; right: 0; background: var(--surface); border: 1px solid var(--border2); padding: 10px; display: none; flex-direction: column; gap: 8px; border-radius: var(--radius); box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 150px; }
-#nav-menu.active { display: flex; }
-#nav-menu a { text-decoration: none; color: var(--text); font-size: 13px; font-weight: 500; padding: 5px 0; }
-
 .btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:34px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12.5px;font-family:inherit;cursor:pointer;font-weight:500;transition:all .15s}
 .btn:hover{background:var(--bg);border-color:var(--border2)}
 .btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
 .btn.primary:hover{background:#0a6b46}
-.last-update{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace; margin-right: 5px;}
+.last-update{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
 
-/* LAYOUT & REST OF STYLES (Disingkat agar tidak terlalu panjang) */
+/* HAMBURGER MENU */
+.ham-btn{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);cursor:pointer;padding:0 8px;flex-shrink:0}
+.ham-btn span{display:block;height:2px;background:var(--text2);border-radius:2px;transition:all .25s}
+.ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham-btn.open span:nth-child(2){opacity:0}
+.ham-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-drawer{position:fixed;top:0;left:0;height:100vh;width:260px;background:var(--surface);border-right:1px solid var(--border);z-index:999;transform:translateX(-100%);transition:transform .28s ease;box-shadow:4px 0 24px rgba(0,0,0,0.08)}
+.nav-drawer.open{transform:translateX(0)}
+.nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:998;opacity:0;pointer-events:none;transition:opacity .28s}
+.nav-overlay.open{opacity:1;pointer-events:all}
+.nav-header{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--border)}
+.nav-header h2{font-size:14px;font-weight:600}
+.nav-header p{font-size:11px;color:var(--text3);margin-top:2px}
+.nav-section{padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.65rem 1.25rem;font-size:13.5px;color:var(--text);text-decoration:none;font-weight:500;transition:background .15s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg)}
+.nav-item.active{background:var(--green-bg);color:var(--green);border-left-color:var(--green)}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center}
+
+/* LAYOUT */
 .container{max-width:1200px;margin:0 auto;padding:1.5rem}
+
+/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
-.stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;font-weight:500}
-.stat-card .value{font-size:28px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.stat-card .label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
+.stat-card .value{font-size:28px;font-weight:600;color:var(--text);line-height:1;font-family:'DM Mono',monospace}
+.stat-card .sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-card.green{border-left:3px solid var(--green-mid)}
+.stat-card.green .value{color:var(--green)}
+.stat-card.red{border-left:3px solid #e85d3a}
+.stat-card.red .value{color:var(--red)}
+.stat-card.amber{border-left:3px solid #d4a017}
+.stat-card.amber .value{color:var(--amber)}
+
+/* SUMMARY BAR */
+.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem}
+.summary-bar .bar-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
 .progress-track{height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));transition:width .6s ease}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));border-radius:999px;transition:width .6s ease}
+.bar-meta{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+
+/* MONTH ROW */
 .month-section{margin-bottom:1.25rem}
-.mpill{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:30px;border-radius:999px;border:1px solid var(--border2);background:var(--surface);font-size:12px;cursor:pointer;margin: 3px}
+.month-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
+.month-pills{display:flex;gap:6px;flex-wrap:wrap}
+.mpill{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:30px;border-radius:999px;border:1px solid var(--border2);background:var(--surface);font-size:12px;cursor:pointer;font-family:inherit;color:var(--text2);font-weight:500;transition:all .15s}
+.mpill:hover{border-color:var(--border2);background:var(--bg)}
 .mpill.active{background:var(--green-bg);border-color:var(--green-mid);color:var(--green)}
-.filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-.filter-row input{flex:1;min-width:200px;height:36px;border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px}
-.fbtn{padding:0 13px;height:36px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);cursor:pointer}
-.fbtn.on{background:var(--text);color:#fff}
+.mpill.many-missing{border-color:#f0a080;color:var(--red)}
+.mpill .count{font-size:10px;font-family:'DM Mono',monospace;background:var(--bg);padding:1px 5px;border-radius:999px}
+.mpill.active .count{background:rgba(29,168,118,.15)}
+
+/* FILTER ROW */
+.filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.filter-row input{flex:1;min-width:200px;height:36px;border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:border .15s}
+.filter-row input:focus{border-color:#1da876}
+.fbtn{padding:0 13px;height:36px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--text2);font-weight:500;transition:all .15s}
+.fbtn:hover{background:var(--bg)}
+.fbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* BLOK FILTER */
 .blok-row{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap}
-.bbtn{padding:0 11px;height:28px;border-radius:999px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
-.bbtn.on{background:var(--text);color:#fff}
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto}
+.bbtn{padding:0 11px;height:28px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:11.5px;cursor:pointer;font-family:'DM Mono',monospace;color:var(--text2);font-weight:500;transition:all .15s}
+.bbtn:hover{background:var(--bg);border-color:var(--border2)}
+.bbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* TABLE */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto; /* <-- INI YANG DITAMBAHKAN AGAR BISA DIGESER */
+  -webkit-overflow-scrolling: touch; /* Biar gesernya mulus di HP Android/iPhone */
+}
 .table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
-.table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;color:var(--text3);text-transform:uppercase}
-.table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border)}
-.status-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px}
+.table-wrap thead th{background:var(--bg);border-bottom:1px solid var(--border);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.table-wrap tbody td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+.table-wrap tbody tr:last-child td{border-bottom:none}
+.table-wrap tbody tr:hover td{background:#fafaf8}
+.no-cell{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+.blok-tag{font-family:'DM Mono',monospace;font-size:10.5px;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:6px;color:var(--text2);display:inline-block;white-space:nowrap}
+.nama-cell{font-size:12.5px;font-weight:500}
+.dots{display:flex;flex-wrap:wrap;gap:2px}
+.dot{width:19px;height:19px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:600;font-family:'DM Mono',monospace}
+.dot.ok{background:var(--green-bg);color:var(--green)}
+.dot.no{background:var(--red-bg);color:var(--red)}
+.total-cell{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;text-align:right;white-space:nowrap}
+.status-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px;text-align:center}
 .status-pill.ok{background:var(--green-bg);color:var(--green)}
 .status-pill.partial{background:var(--amber-bg);color:var(--amber)}
 .status-pill.no{background:var(--red-bg);color:var(--red)}
-.tfoot{padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);background:var(--bg)}
-.state-box{text-align:center;padding:3rem 1rem}
-.err-box{background:var(--red-bg);border:1px solid #f5c0b0;padding:1rem;margin-bottom:1.25rem;border-radius:var(--radius-lg)}
-@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media print{.header,.filter-row,.blok-row,.month-section,.btn,.fbtn,.bbtn,.mpill{display:none!important}}
+
+/* FOOTER */
+.tfoot{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);background:var(--bg)}
+
+/* LOADING / ERROR */
+.state-box{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.state-box .icon{font-size:32px;margin-bottom:12px}
+.state-box p{font-size:14px}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--green-mid);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{background:var(--red-bg);border:1px solid #f5c0b0;border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:13px;color:var(--red)}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .container{padding:1rem}
+  .header{padding:1rem}
+  .nama-cell{font-size:12px}
+  .dot{width:16px;height:16px;font-size:7.5px}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat-card .value{font-size:22px}
+}
+
+/* PRINT */
+@media print{
+  .header,.filter-row,.blok-row,.month-section,.btn,.fbtn,.bbtn,.mpill{display:none!important}
+  .table-wrap{border:1px solid #ccc}
+  body{background:#fff}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo-area">
-    <div class="logo-circle"><img src="Logo RT11.png" alt="Logo" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/></div>
+    <div class="logo-circle">
+  <img src="Logo RT11.png" alt="Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
+</div>
     <div class="logo-text">
       <h1>Kas Puri Asri 3</h1>
       <p>RT 01 / RW 012 · TH.2026</p>
     </div>
   </div>
-  
   <div class="header-right">
     <span class="last-update" id="last-update"></span>
-    <button class="btn" onclick="init()">↺</button>
-    
-    <div class="menu-container">
-      <div class="menu-btn" onclick="document.getElementById('nav-menu').classList.toggle('active')">
-        <span></span><span></span><span></span>
-      </div>
-      <nav id="nav-menu">
-        <a href="index.html">Beranda</a>
-        <a href="kas-umum.html">Laporan Kas Umum</a>
-        <a href="kematian.html">Laporan Kas Kematian</a>
-      </nav>
-    </div>
-    
+    <button class="btn" onclick="init()">↺ Refresh</button>
     <button class="btn primary" onclick="window.print()">⎙ Cetak</button>
+    <button class="ham-btn" id="ham-btn" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </div>
+
+<!-- Overlay -->
+<div class="nav-overlay" id="nav-overlay" onclick="closeNav()"></div>
+
+<!-- Navigation Drawer -->
+<nav class="nav-drawer" id="nav-drawer">
+  <div class="nav-header">
+    <h2>Kas Puri Asri 3</h2>
+    <p>RT 01 / RW 012 · TH. 2026</p>
+  </div>
+  <div class="nav-section">Menu Utama</div>
+  <a class="nav-item" href="index.html">
+    <span class="nav-icon">🏠</span> Beranda
+  </a>
+  <div class="nav-section">Keuangan</div>
+  <a class="nav-item active" href="kas-umum.html">
+    <span class="nav-icon">💰</span> Laporan Kas Umum
+  </a>
+  <a class="nav-item" href="Kematian.html">
+    <span class="nav-icon">🏡</span> Laporan Dana Kematian
+  </a>
+  <a class="nav-item" href="pengeluaran-kas.html">
+    <span class="nav-icon">📋</span> Pengeluaran Kas
+  </a>
+  <a class="nav-item" href="pengeluaran-kematian.html">
+    <span class="nav-icon">📄</span> Pengeluaran Dana Kematian
+  </a>
+  <div class="nav-section">Segera Hadir</div>
+  <a class="nav-item" style="opacity:.4;pointer-events:none" href="#">
+    <span class="nav-icon">📅</span> Program &amp; Acara RT
+  </a>
+  <a class="nav-item" style="opacity:.4;pointer-events:none" href="#">
+    <span class="nav-icon">📦</span> Daftar Inventaris
+  </a>
+  <a class="nav-item" style="opacity:.4;pointer-events:none" href="#">
+    <span class="nav-icon">📃</span> AD/ART
+  </a>
+  <a class="nav-item" style="opacity:.4;pointer-events:none" href="#">
+    <span class="nav-icon">🖼️</span> Dokumentasi Acara
+  </a>
+</nav>
 
 <div class="container">
   <div id="err-box" class="err-box" style="display:none"></div>
@@ -110,7 +226,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <p>Mengambil data dari Google Sheets...</p>
   </div>
 
-    <div id="content" style="display:none">
+  <div id="content" style="display:none">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="label">Total Anggota</div>
@@ -363,6 +479,17 @@ async function init() {
 }
 
 init();
+
+function toggleNav(){
+  document.getElementById('nav-drawer').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('open');
+  document.getElementById('ham-btn').classList.toggle('open');
+}
+function closeNav(){
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('nav-overlay').classList.remove('open');
+  document.getElementById('ham-btn').classList.remove('open');
+}
 </script>
 </body>
 </html>
