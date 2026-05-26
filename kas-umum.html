@@ -66,6 +66,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .stat-card.amber{border-left:3px solid #d4a017}
 .stat-card.amber .value{color:var(--amber)}
 
+/* FINANCE BAR */
+.finance-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;display:flex;flex-direction:column;gap:4px}
+.fin-card .fin-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.fin-card .fin-value{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;line-height:1.2}
+.fin-card .fin-sub{font-size:11px;color:var(--text3)}
+.fin-card.masuk{border-top:3px solid var(--green-mid)}
+.fin-card.masuk .fin-value{color:var(--green)}
+.fin-card.keluar{border-top:3px solid #e85d3a}
+.fin-card.keluar .fin-value{color:var(--red)}
+.fin-card.saldo{border-top:3px solid #d4a017;background:var(--amber-bg)}
+.fin-card.saldo .fin-value{color:var(--amber)}
+@media(max-width:600px){.finance-bar{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+
 /* SUMMARY BAR */
 .summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem}
 .summary-bar .bar-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
@@ -165,7 +179,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
     <div class="logo-text">
       <h1>Kas Puri Asri 3</h1>
-      <p>RT 01 / RW 12 · TH.2026</p>
+      <p>RT 01 / RW 012 · TH.2026</p>
     </div>
   </div>
   <div class="header-right">
@@ -185,7 +199,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <nav class="nav-drawer" id="nav-drawer">
   <div class="nav-header">
     <h2>Kas Puri Asri 3</h2>
-    <p>RT 01 / RW 12 · TH. 2026</p>
+    <p>RT 01 / RW 012 · TH. 2026</p>
   </div>
   <div class="nav-section">Menu Utama</div>
   <a class="nav-item" href="index.html">
@@ -227,6 +241,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 
   <div id="content" style="display:none">
+    <!-- FINANCE BAR: Masuk / Keluar / Saldo -->
+    <div class="finance-bar">
+      <div class="fin-card masuk">
+        <div class="fin-label">💰 Total Dana Masuk</div>
+        <div class="fin-value" id="fin-masuk">—</div>
+        <div class="fin-sub" id="fin-masuk-sub">dari iuran warga tahun ini</div>
+      </div>
+      <div class="fin-card keluar">
+        <div class="fin-label">📤 Total Pengeluaran</div>
+        <div class="fin-value" id="fin-keluar">—</div>
+        <div class="fin-sub" id="fin-keluar-sub">pengeluaran kas tercatat</div>
+      </div>
+      <div class="fin-card saldo">
+        <div class="fin-label">🏦 Sisa Saldo</div>
+        <div class="fin-value" id="fin-saldo">—</div>
+        <div class="fin-sub">masuk dikurangi pengeluaran</div>
+      </div>
+    </div>
+
     <div class="stats-grid">
       <div class="stat-card">
         <div class="label">Total Anggota</div>
@@ -298,6 +331,45 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <script>
 // Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
+
+// ── Ambil baris MASUK & KELUAR dari raw CSV sebelum data anggota ──
+function parseFinance(text) {
+  const lines = text.split('\n');
+  let masuk = 0, keluar = 0;
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    const upper = lines[i].toUpperCase();
+    const cols = splitLine(lines[i]);
+    // Cari baris yang ada kata MASUK
+    if (upper.includes('MASUK') && !upper.includes('PEMILIK')) {
+      // Cari nilai rupiah di kolom-kolom berikutnya
+      for (let c = 0; c < cols.length; c++) {
+        const val = parseRp(cols[c]);
+        if (val > 0 && val > masuk) masuk = val;
+      }
+    }
+    // Cari baris yang ada kata KELUAR
+    if (upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
+      for (let c = 0; c < cols.length; c++) {
+        const val = parseRp(cols[c]);
+        if (val > 0 && val > keluar) keluar = val;
+      }
+    }
+    // Juga cek SISA / SALDO jika ada
+  }
+  return { masuk, keluar };
+}
+
+// Parse format Rp seperti "Rp17,073,500" atau "17073500"
+function parseRp(v) {
+  if (!v) return 0;
+  v = v.toString().replace(/"/g, '').replace(/Rp/gi, '').replace(/\./g, '').replace(/,/g, '').trim();
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+}
+
+function fmtRpFull(n) {
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
 
 const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const MK = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -378,9 +450,23 @@ function parseCSV(text) {
   }
 }
 
-function buildUI() {
+function buildUI(finData) {
   const total = allRows.length;
   if (total === 0) return;
+
+  // Hitung masuk dari data iuran warga (otomatis)
+  const masukIuran = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
+
+  // Gunakan masuk dari baris header sheet jika > masukIuran, else pakai iuran
+  const masuk = (finData && finData.masuk > 0) ? finData.masuk : masukIuran;
+  const keluar = (finData && finData.keluar > 0) ? finData.keluar : 0;
+  const saldo = masuk - keluar;
+
+  document.getElementById('fin-masuk').textContent = fmtRpFull(masuk);
+  document.getElementById('fin-masuk-sub').textContent = 'dari iuran warga tahun ini';
+  document.getElementById('fin-keluar').textContent = fmtRpFull(keluar);
+  document.getElementById('fin-keluar-sub').textContent = keluar > 0 ? 'pengeluaran kas tercatat' : 'belum ada data pengeluaran';
+  document.getElementById('fin-saldo').textContent = fmtRpFull(saldo);
   
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
   const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
@@ -460,13 +546,14 @@ async function init() {
     if (!res.ok) throw new Error('Gagal menarik data langsung dari Google Sheets.');
     
     const text = await res.text();
+    const finData = parseFinance(text);
     parseCSV(text);
     
     if (allRows.length === 0) {
       throw new Error('Data gagal diproses. Kolom BLOK atau PEMILIK tidak ditemukan.');
     }
     
-    buildUI();
+    buildUI(finData);
     render();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
