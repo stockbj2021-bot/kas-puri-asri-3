@@ -332,31 +332,65 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 // Link CSV murni langsung tanpa proxy (Aman karena dijalankan dari server web GitHub)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSecgIrIDB7KwykxMqHKml53NWH0dwynUISNo_ddb1DyThBmklHex3_RJRc4Ez3SDYrgcPaHTq0LaW3/pub?gid=974775933&single=true&output=csv';
 
-// ── Ambil baris MASUK & KELUAR dari raw CSV sebelum data anggota ──
+// ── Ambil MASUK, KELUAR, SISA dari raw CSV (baris header sheet) ──
 function parseFinance(text) {
   const lines = text.split('\n');
-  let masuk = 0, keluar = 0;
-  for (let i = 0; i < Math.min(20, lines.length); i++) {
+  let masuk = 0, keluar = 0, sisa = 0;
+
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
     const upper = lines[i].toUpperCase();
     const cols = splitLine(lines[i]);
-    // Cari baris yang ada kata MASUK
-    if (upper.includes('MASUK') && !upper.includes('PEMILIK')) {
-      // Cari nilai rupiah di kolom-kolom berikutnya
+
+    // Dari foto sheet: baris MASUK dan KELUAR ada di baris yang SAMA
+    // Format: ..., MASUK>, [nilai masuk], ..., KELUAR, [nilai keluar], ...
+    if (upper.includes('MASUK') && upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
+      let foundMasuk = false;
       for (let c = 0; c < cols.length; c++) {
+        const cellUp = cols[c].toUpperCase().replace(/"/g,'').trim();
+        if (cellUp.includes('MASUK')) { foundMasuk = true; continue; }
+        if (cellUp.includes('KELUAR')) { foundMasuk = false; }
         const val = parseRp(cols[c]);
-        if (val > 0 && val > masuk) masuk = val;
+        if (val > 0) {
+          if (foundMasuk && masuk === 0) { masuk = val; foundMasuk = false; }
+          else if (!foundMasuk && keluar === 0 && masuk > 0) { keluar = val; }
+        }
       }
     }
-    // Cari baris yang ada kata KELUAR
-    if (upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
+
+    // Baris MASUK saja (tanpa KELUAR di baris yang sama)
+    if (upper.includes('MASUK') && !upper.includes('KELUAR') && !upper.includes('PEMILIK')) {
+      let take = false;
       for (let c = 0; c < cols.length; c++) {
+        if (cols[c].toUpperCase().includes('MASUK')) { take = true; continue; }
         const val = parseRp(cols[c]);
-        if (val > 0 && val > keluar) keluar = val;
+        if (take && val > 0) { masuk = val; break; }
       }
     }
-    // Juga cek SISA / SALDO jika ada
+
+    // Baris KELUAR saja
+    if (upper.includes('KELUAR') && !upper.includes('MASUK') && !upper.includes('PEMILIK')) {
+      let take = false;
+      for (let c = 0; c < cols.length; c++) {
+        if (cols[c].toUpperCase().includes('KELUAR')) { take = true; continue; }
+        const val = parseRp(cols[c]);
+        if (take && val > 0) { keluar = val; break; }
+      }
+    }
+
+    // Baris SISA / SALDO
+    if ((upper.includes('SISA') || upper.includes('SALDO')) && !upper.includes('PEMILIK')) {
+      for (let c = 0; c < cols.length; c++) {
+        const val = parseRp(cols[c]);
+        if (val > 0 && val > sisa) sisa = val;
+      }
+    }
   }
-  return { masuk, keluar };
+
+  // Jika sisa terbaca langsung dari sheet, pakai itu; kalau tidak, hitung manual
+  if (sisa === 0 && masuk > 0) sisa = masuk - keluar;
+
+  console.log('[Finance] masuk:', masuk, '| keluar:', keluar, '| sisa:', sisa);
+  return { masuk, keluar, sisa };
 }
 
 // Parse format Rp seperti "Rp17,073,500" atau "17073500"
@@ -454,19 +488,16 @@ function buildUI(finData) {
   const total = allRows.length;
   if (total === 0) return;
 
-  // Hitung masuk dari data iuran warga (otomatis)
-  const masukIuran = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
-
-  // Gunakan masuk dari baris header sheet jika > masukIuran, else pakai iuran
-  const masuk = (finData && finData.masuk > 0) ? finData.masuk : masukIuran;
+  // Ambil dari sheet langsung (masuk = total semua pemasukan termasuk saldo tahun lalu)
+  const masuk  = (finData && finData.masuk  > 0) ? finData.masuk  : allRows.reduce((s,r)=>s+r.months.reduce((ss,v)=>ss+parseK(v),0),0);
   const keluar = (finData && finData.keluar > 0) ? finData.keluar : 0;
-  const saldo = masuk - keluar;
+  const saldo  = (finData && finData.sisa   > 0) ? finData.sisa   : (masuk - keluar);
 
-  document.getElementById('fin-masuk').textContent = fmtRpFull(masuk);
-  document.getElementById('fin-masuk-sub').textContent = 'dari iuran warga tahun ini';
+  document.getElementById('fin-masuk').textContent  = fmtRpFull(masuk);
+  document.getElementById('fin-masuk-sub').textContent = 'total kas masuk (termasuk saldo lama)';
   document.getElementById('fin-keluar').textContent = fmtRpFull(keluar);
   document.getElementById('fin-keluar-sub').textContent = keluar > 0 ? 'pengeluaran kas tercatat' : 'belum ada data pengeluaran';
-  document.getElementById('fin-saldo').textContent = fmtRpFull(saldo);
+  document.getElementById('fin-saldo').textContent  = fmtRpFull(saldo);
   
   const hasBayar = allRows.filter(r => r.months.some(v => paid(v))).length;
   const kas = allRows.reduce((s, r) => s + r.months.reduce((ss, v) => ss + parseK(v), 0), 0);
